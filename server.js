@@ -12,14 +12,17 @@ const server = express();
 
 server.use(bodyParser.json());
 // server.use(bodyParser.urlencoded({ extended: true }));
-server.use(cors({ origin: '*' }));
-server.use('/user',userRoutes);
+server.use(cors({
+    origin:
+        "http://127.0.0.1:5500",
+}))
+server.use('/user', userRoutes);
 
-server.use((req,res)=>{
+server.use((req, res) => {
     return res.json({ "Message": "You are in DEFAULT 'USE' path", "SUCCESS": true });
 })
 
-db.sync().then(()=>{
+db.sync().then(() => {
     server.listen(process.env.HTTP_PORT, () => console.log(`Listening to PORT : ${process.env.HTTP_PORT}`));
 })
-.catch(err => console.log(err));
+    .catch(err => console.log(err));
