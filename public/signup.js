@@ -1,5 +1,5 @@
 const backendApi = "http://localhost:3000";
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
+document.addEventListener('submit', async (e) => {
     e.preventDefault();
     //console.log("NAME: " + document.getElementById('name').value);     console.log("email: " + document.getElementById('email').value);    console.log("phone: " + document.getElementById('phone').value);    console.log("password: " + document.getElementById('pass').value);
     try {
