@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 exports.signUp = async (req, res) => {
     console.log("!!Request from FRONTend recieved by backend");
     //console.log("\n-----------\nValues:\nName: " + req.body.name + "\nEmail: " + req.body.email + "\nPhone: " + req.body.phone + "\nPassword: " + req.body.password);
@@ -33,4 +35,31 @@ exports.signUp = async (req, res) => {
         }
     }
     //res.status(200).json({Success:true,Message:"Request has been recieved by your backend!"});
+}
+
+exports.login = async (req, res) => {
+    const email = req.body.email;
+    const pass = req.body.password;
+    const userInDb = await User.findOne({ where: { email: email } });
+    console.log("User found:" + userInDb)
+    if (userInDb) {
+        const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
+        //If user in DB > Check Pass
+        if (isPassCorrect) {
+            res.status(200).send({ success: true, message: "User found!", token: `Bearer ${generateToken(email)}` })
+        }
+        else {
+            res.status(401).send({ success: false, message: "Wrong Password!" });
+        }
+    }
+    else {
+        //If User not in DB
+        res.status(404).send({ success: false, message: "User Not found" })
+    }
+
+
+}
+
+function generateToken(email) {
+    return accessToken = jwt.sign(email, process.env.TOKEN_SECRET);
 }
