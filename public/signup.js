@@ -6,7 +6,10 @@ document.addEventListener('submit', async (e) => {
         const target = e.target;
         let response = await axios.post(`${backendApi}/user/signup`, { name: target.name.value, email: target.email.value, phone: target.phone.value, password: target.pass.value });
         console.log(response);
-        if (response.status == 200) alert("Successfuly signed up!");
+        if (response.status == 200) {
+            alert("Successfuly signed up!");
+            window.location.href = 'login.html'; // Navigate to Login Page if successful signup
+        }
     }
     catch (err) {
         if (err.response.data.error.at(0) == "email must be unique") {

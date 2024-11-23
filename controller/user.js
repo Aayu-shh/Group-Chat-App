@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Message = require('../models/chat');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -41,12 +42,13 @@ exports.login = async (req, res) => {
     const email = req.body.email;
     const pass = req.body.password;
     const userInDb = await User.findOne({ where: { email: email } });
+    const id = userInDb.id;
     console.log("User found:" + userInDb)
     if (userInDb) {
         const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
         //If user in DB > Check Pass
         if (isPassCorrect) {
-            res.status(200).send({ success: true, message: "User found!", token: `Bearer ${generateToken(email)}` })
+            res.status(200).send({ success: true, message: "User found!", token: `${generateToken(email, id)}` })
         }
         else {
             res.status(401).send({ success: false, message: "Wrong Password!" });
@@ -60,6 +62,19 @@ exports.login = async (req, res) => {
 
 }
 
-function generateToken(email) {
-    return accessToken = jwt.sign(email, process.env.TOKEN_SECRET);
+exports.chat = async (req, res) => {
+    const incoming = req.body.message;
+    console.log("Message from Frontend ->" + incoming);
+    try {
+        const newMessage = await Message.create({ message: incoming, userId: req.user.id })
+        return res.send({ message: newMessage, success: true });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ success: false, error: err });
+    }
+}
+
+function generateToken(email, userId) {
+    return accessToken = jwt.sign({ email, userId }, process.env.TOKEN_SECRET);
 }
