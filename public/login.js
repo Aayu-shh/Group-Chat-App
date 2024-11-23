@@ -4,4 +4,9 @@ document.addEventListener('submit', async e => {
     e.preventDefault();
     let response = await axios.post(`${backendApi}/user/login`, { email: e.target.email.value, password: e.target.password.value });
     console.log(response);
+    if (response.data.token) {
+        window.localStorage.setItem("token", response.data.token);
+        alert("Login Success")
+        window.location.href = 'chatScreen.html'
+    }
 })

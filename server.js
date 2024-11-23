@@ -14,7 +14,8 @@ server.use(bodyParser.json());
 // server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cors({
     origin:
-        "http://127.0.0.1:5500",
+        // "http://127.0.0.1:5500",
+        "*"
 }))
 server.use('/user', userRoutes);
 
