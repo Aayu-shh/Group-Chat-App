@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
     const pass = req.body.password;
     const userInDb = await User.findOne({ where: { email: email } });
     const id = userInDb.id;
-    console.log("User found:" + userInDb)
+    console.log("User found:" + userInDb.name)
     if (userInDb) {
         const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
         //If user in DB > Check Pass
@@ -72,6 +72,18 @@ exports.chat = async (req, res) => {
     catch (err) {
         console.log(err);
         return res.status(500).json({ success: false, error: err });
+    }
+}
+
+exports.getMessages = async (req, res) => {
+    try {
+        const messages = await Message.findAll();
+        messages.forEach(x => console.log(x.message));
+        return res.send({ messages, success: true });
+    }
+    catch (err) {
+        console.log(err);
+        return res.stats(500).send({ message: "Something Went Wrong!", error: err, })
     }
 }
 

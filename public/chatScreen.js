@@ -15,3 +15,18 @@ document.querySelector('.send-button').onclick = async (e) => {
         console.log(err);
     }
 }
+
+document.addEventListener('DOMContentLoaded', async e => {
+    const reloadedResponse = await axios.get(`${backendApi}/user/loadmessages`, {
+        headers: {
+            "Authorization": localStorage.getItem("token")
+        }
+    })
+    reloadedResponse.data.messages.map(x => {
+        const messageDiv = document.createElement('div');
+        messageDiv.innerText = "" + x.message;
+        messageDiv.className = "message my-message";
+        document.querySelector(".chat-area").appendChild(messageDiv);
+    });
+
+})
