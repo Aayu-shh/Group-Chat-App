@@ -9,6 +9,7 @@ document.querySelector('.send-button').onclick = async (e) => {
                 "Authorization": localStorage.getItem("token")
             }
         });
+        message.value = "";
         console.log("Message posted success? :" + response.data.success);
     }
     catch (err) {
