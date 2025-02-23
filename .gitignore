@@ -4053,3 +4053,10 @@ node_modules/lodash.isstring/README.md
 node_modules/lodash.once/index.js
 node_modules/lodash.once/LICENSE
 node_modules/lodash.once/README.md
+node_modules/gopd/index.d.ts
+node_modules/gopd/tsconfig.json
+node_modules/qs/test/empty-keys-cases.js
+node_modules/send/node_modules/encodeurl/HISTORY.md
+node_modules/send/node_modules/encodeurl/index.js
+node_modules/send/node_modules/encodeurl/LICENSE
+node_modules/send/node_modules/encodeurl/README.md

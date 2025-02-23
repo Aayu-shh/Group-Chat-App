@@ -26,7 +26,12 @@ document.addEventListener('DOMContentLoaded', async e => {
     reloadedResponse.data.messages.map(x => {
         const messageDiv = document.createElement('div');
         messageDiv.innerText = "" + x.message;
-        messageDiv.className = "message my-message";
+        if (x.userId == localStorage.getItem('userId')) {
+            messageDiv.className = "message my-message";
+        }
+        else {
+            messageDiv.className = "message user-message";
+        }
         document.querySelector(".chat-area").appendChild(messageDiv);
     });
 

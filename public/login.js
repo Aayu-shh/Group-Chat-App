@@ -6,6 +6,7 @@ document.addEventListener('submit', async e => {
     console.log(response);
     if (response.data.token) {
         window.localStorage.setItem("token", response.data.token);
+        window.localStorage.setItem("userId", response.data.userId);
         alert("Login Success")
         window.location.href = 'chatScreen.html'; //TODO : try sending url from Backend with success
     }

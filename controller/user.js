@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Message = require('../models/chat');
+const Message = require('../models/message');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
         const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
         //If user in DB > Check Pass
         if (isPassCorrect) {
-            res.status(200).send({ success: true, message: "User found!", token: `${generateToken(email, id)}` })
+            res.status(200).send({ success: true, message: "User found!", token: `${generateToken(email, id)}`, userId: id });
         }
         else {
             res.status(401).send({ success: false, message: "Wrong Password!" });
@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
     }
     else {
         //If User not in DB
-        res.status(404).send({ success: false, message: "User Not found" })
+        res.status(404).send({ success: false, message: "User Not found" });
     }
 
 
