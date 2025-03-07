@@ -2,6 +2,7 @@ const User = require('../models/user');
 const Message = require('../models/message');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Sequelize, Op } = require('sequelize');
 
 exports.signUp = async (req, res) => {
     console.log("!!Request from FRONTend recieved by backend");
@@ -83,7 +84,34 @@ exports.getMessages = async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        return res.stats(500).send({ message: "Something Went Wrong!", error: err, })
+        return res.send(500).send({ message: "Something Went Wrong!", error: err, });
+    }
+}
+
+exports.getNew = async (req, res) => {
+    try {
+        const messageCount = await Message.count();
+        const numOfMessagesOnScreen = req.query.numOfMessages;
+        if (messageCount > parseInt(numOfMessagesOnScreen)) {
+            const newMessages = await Message.findAll({
+                where: {
+                    id: {
+                        [Op.gt]: parseInt(numOfMessagesOnScreen)
+                    }
+                }
+            });
+            return res.send({ newMessages: newMessages, success: true, count: newMessages.length, error: null });
+        }
+        else if (messageCount === parseInt(numOfMessagesOnScreen)) {
+            return res.send({ newMessages: null, success: true, count: 0, error: null });
+        }
+        else {
+            return res.send({ newMessages: null, success: false, count: 0, error: "Something went wrong" });
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({ message: "Something Went Wrong!", error: err, });
     }
 }
 
