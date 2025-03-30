@@ -78,22 +78,30 @@ exports.chat = async (req, res) => {
 
 exports.getMessages = async (req, res) => {
     try {
-        const messages = await Message.findAll();
+        const lastMsgId = parseInt(req.query.lastMsgId) || 0;
+        const messages = await Message.findAll({
+            where: {
+                id: {
+                    [Op.gt]: parseInt(lastMsgId)
+                }
+            }
+        });
         messages.forEach(x => console.log(x.message));
-        return res.send({ messages, success: true });
+        return res.send({ messages, success: true, count: messages.length, error: null });
     }
     catch (err) {
         console.log(err);
-        return res.send(500).send({ message: "Something Went Wrong!", error: err, });
+        return res.send(500).send({ message: "Something Went Wrong!", success: false, count: 0, error: err, });
     }
 }
 
-exports.getNew = async (req, res) => {
+exports.getNewMessagesByCount = async (req, res) => {
     try {
         const messageCount = await Message.count();
         const numOfMessagesOnScreen = req.query.numOfMessages;
         if (messageCount > parseInt(numOfMessagesOnScreen)) {
             const newMessages = await Message.findAll({
+                //checking by ID is not optimal, id messages are deleted from DB IDs will mislead 
                 where: {
                     id: {
                         [Op.gt]: parseInt(numOfMessagesOnScreen)
@@ -109,6 +117,46 @@ exports.getNew = async (req, res) => {
             return res.send({ newMessages: null, success: false, count: 0, error: "Something went wrong" });
         }
     }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({ message: "Something Went Wrong!", error: err, });
+    }
+}
+
+exports.getNewMessagesById = async (req, res) => {
+    try {
+        const lastMsgIdOnScreen = parseInt(req.query.lastMsgId, 0);
+
+        // Validate the parsed ID to ensure it is a non-negative number
+        if (isNaN(lastMsgIdOnScreen) || lastMsgIdOnScreen < 0) {
+            return res.status(400).send({ success: false, error: "Invalid or missing lastMsgId provided" });
+        }
+
+        // Fetch the maximum message ID currently in the database
+        const lastMessage = await Message.findOne({
+            attributes: [[Sequelize.fn('MAX', Sequelize.col('id')), 'maxId']]
+        });
+        const lastIdInDB = lastMessage ? lastMessage.get('maxId') : 0;
+
+        // Compare the last message ID on the screen with the maximum ID in the database
+        if (lastIdInDB > parseInt(lastMsgIdOnScreen)) {
+            const newMessages = await Message.findAll({
+                where: {
+                    id: {
+                        [Op.gt]: parseInt(lastMsgIdOnScreen) // Fetch messages with IDs greater than lastMsgIdOnScreen
+                    }
+                }
+            });
+            return res.send({ newMessages: newMessages, success: true, count: newMessages.length, error: null });
+        }
+        else if (lastIdInDB === parseInt(lastMsgIdOnScreen)) {
+            return res.send({ newMessages: null, success: true, count: 0, error: null });
+        }
+        else {
+            return res.send({ newMessages: null, success: false, count: 0, error: "Something went wrong" });
+        }
+    }
+
     catch (err) {
         console.log(err);
         return res.status(500).send({ message: "Something Went Wrong!", error: err, });

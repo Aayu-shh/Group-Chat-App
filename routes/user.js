@@ -7,5 +7,6 @@ router.post('/signup', userController.signUp);
 router.post('/login', userController.login);
 router.post('/chat', userAuth.authenticate, userController.chat);
 router.get('/loadmessages', userAuth.authenticate, userController.getMessages)
-router.get('/newMessage', userAuth.authenticate, userController.getNew);
+// router.get('/newMessage', userAuth.authenticate, userController.getNewMessagesByCount);
+router.get('/newMessage', userAuth.authenticate, userController.getNewMessagesById);
 module.exports = router;
