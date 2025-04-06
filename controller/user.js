@@ -40,26 +40,29 @@ exports.signUp = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    const email = req.body.email;
-    const pass = req.body.password;
-    const userInDb = await User.findOne({ where: { email: email } });
-    const id = userInDb.id;
-    console.log("User found:" + userInDb.name)
-    if (userInDb) {
-        const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
-        //If user in DB > Check Pass
-        if (isPassCorrect) {
-            res.status(200).send({ success: true, message: "User found!", token: `${generateToken(email, id)}`, userId: id });
+    try {
+        const email = req.body.email;
+        const pass = req.body.password;
+        const userInDb = await User.findOne({ where: { email: email } });
+        const id = userInDb ? userInDb.id : null;
+        if (userInDb) {
+            const isPassCorrect = await bcrypt.compare(pass, userInDb.password);
+            //If user in DB > Check Pass
+            if (isPassCorrect) {
+                res.status(200).send({ success: true, message: "User found!", token: `${generateToken(email, id)}`, userId: id, error: null });
+            }
+            else {
+                res.status(401).send({ success: false, message: "Wrong Password!", error: null });
+            }
         }
         else {
-            res.status(401).send({ success: false, message: "Wrong Password!" });
+            //If User not in DB
+            res.status(404).send({ success: false, message: "User Not found", error: null });
         }
     }
-    else {
-        //If User not in DB
-        res.status(404).send({ success: false, message: "User Not found" });
+    catch (err) {
+        res.status(500).send({ success: false, message: "Something Went Wrong!", error: err.message });
     }
-
 
 }
 
