@@ -1,6 +1,8 @@
 const backendApi = "http://localhost:3000";
 
 const message = document.querySelector('.message-input');
+const newGroupBtn = document.getElementById("newGroupBtn");
+const newGrpDiv = document.querySelector('.newGrpDiv');
 
 document.querySelector('.send-button').onclick = async (e) => {
     let myMessage = message.value;
@@ -70,6 +72,30 @@ async function callAPI_ById() {
     }
     else {
         window.location.reload();
+    }
+}
+
+newGroupBtn.onclick = () => {
+    try {
+        newGroupBtn.remove();
+        newGrpDiv.innerHTML = `<label>Group Name:</label>
+                                        <input type="text" class="groupName">
+                                        <button class="create">Create Group</button>`
+        document.querySelector('.create').onclick = async () => {
+            let enteredGrpName = document.querySelector('.groupName').value.trim();
+            console.log(enteredGrpName);
+            const grpNameResp = await axios.post(`${backendApi}/user/group/create`, { groupName: `${enteredGrpName}` }, {
+                headers: {
+                    "Authorization": localStorage.getItem("token")
+                }
+            });
+            console.log(grpNameResp);
+            newGrpDiv.remove();
+        }
+
+    }
+    catch (err) {
+        console.log(err);
     }
 }
 

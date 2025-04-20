@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const db = require('./util/db');
 const User = require('./models/user');
 const Messages = require('./models/message');
+const Group = require('./models/group');
 const path = require("path");
 const userRoutes = require('./routes/user');
 const server = express();
@@ -30,7 +31,12 @@ server.use((req, res) => {
 User.hasMany(Messages);
 Messages.belongsTo(User);
 
-db.sync().then(() => {
+Messages.belongsTo(Group);
+//To create junction Table holding userId and groupId relations
+User.belongsToMany(Group, { through: 'UserGroup' });
+Group.belongsToMany(User, { through: 'UserGroup' })
+
+db.sync({ force: false }).then(() => {
     server.listen(process.env.HTTP_PORT, () => console.log(`Listening to PORT : ${process.env.HTTP_PORT}`));
 })
     .catch(err => console.log(err));

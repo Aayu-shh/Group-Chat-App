@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Message = require('../models/message');
+const Group = require('../models/group');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize, Op } = require('sequelize');
@@ -13,7 +14,7 @@ exports.signUp = async (req, res) => {
     const phone = req.body.phone;
     try {
         if (!name || !email || !password) {
-            return res.status(400).json({ error: "Name,Email and Password are required feilds" })
+            return res.status(400).json({ error: "Name,Email and Password are required fields" })
         }
         const hashedPass = await bcrypt.hash(password, 10);
         const newUser = await User.create({
@@ -94,37 +95,10 @@ exports.getMessages = async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        return res.send(500).send({ message: "Something Went Wrong!", success: false, count: 0, error: err, });
+        return res.send(500).send({ message: "Something Went Wrong!", success: false, count: 0, error: err });
     }
 }
 
-exports.getNewMessagesByCount = async (req, res) => {
-    try {
-        const messageCount = await Message.count();
-        const numOfMessagesOnScreen = req.query.numOfMessages;
-        if (messageCount > parseInt(numOfMessagesOnScreen)) {
-            const newMessages = await Message.findAll({
-                //checking by ID is not optimal, id messages are deleted from DB IDs will mislead 
-                where: {
-                    id: {
-                        [Op.gt]: parseInt(numOfMessagesOnScreen)
-                    }
-                }
-            });
-            return res.send({ newMessages: newMessages, success: true, count: newMessages.length, error: null });
-        }
-        else if (messageCount === parseInt(numOfMessagesOnScreen)) {
-            return res.send({ newMessages: null, success: true, count: 0, error: null });
-        }
-        else {
-            return res.send({ newMessages: null, success: false, count: 0, error: "Something went wrong" });
-        }
-    }
-    catch (err) {
-        console.log(err);
-        return res.status(500).send({ message: "Something Went Wrong!", error: err, });
-    }
-}
 
 exports.getNewMessagesById = async (req, res) => {
     try {
@@ -163,6 +137,20 @@ exports.getNewMessagesById = async (req, res) => {
     catch (err) {
         console.log(err);
         return res.status(500).send({ message: "Something Went Wrong!", error: err, });
+    }
+}
+
+exports.createNewGroup = async (req, res) => {
+    try {
+        console.log("\n===============================\nRecieved Request from frontend! Working on it!");
+        const groupName = req.body.groupName;
+        console.log("The group name to be created must be: " + req.query.groupName);
+        const groupResultObj = await Group.create({ name: groupName });
+        return res.send({ message: `Created New group named: ${groupName}!`, success: true, result: groupResultObj });
+    }
+    catch (e) {
+        console.log("Error in Group Creation: " + e);
+        return res.status(500).send({ message: "Something Went Wrong", error: e });
     }
 }
 
